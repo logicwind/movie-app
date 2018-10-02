@@ -1,2 +1,1 @@
-# movie-app
-movie graphql web app
+### Movie App
