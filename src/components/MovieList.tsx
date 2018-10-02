@@ -3,11 +3,11 @@ const { Meta } = Card
 import { Card } from 'antd'
 import { Col, Icon, Popconfirm, Row } from 'antd'
 import { Query } from "react-apollo"
-import { GET_MOVIES } from '../queries/Queries'
-import { DELETE_MOVIE } from '../queries/Mutations'
+import { GET_MOVIES, GET_SELECTED_MOVIE } from '../queries/Queries'
+import { SELECT_MOVIE, DELETE_MOVIE } from '../queries/Mutations'
 
 interface MovieListProps {
-  client: Object
+  client: any
 }
 
 class MovieList extends React.Component<MovieListProps, {}> {
@@ -33,6 +33,17 @@ class MovieList extends React.Component<MovieListProps, {}> {
     })
   }
 
+  public selectMovie = (movie) => {
+    const { client } = this.props
+    client.mutate({
+      mutation: SELECT_MOVIE, variables: {
+        ...movie
+      },
+      refetchQueries: {
+        query: GET_SELECTED_MOVIE
+      },
+    })
+  }
 
   public render() {
     return (
@@ -52,10 +63,10 @@ class MovieList extends React.Component<MovieListProps, {}> {
                       style={{ width: 300 }}
                       cover={<img alt={movie.title} src={movie.poster} />}
                       actions={[
-                      // <Icon key="edit" type="edit" />,
-                      <Popconfirm key="delete" title="Are you sure delete this movie?" onConfirm={e => this.deleteMovie(movie.id)} okText="Yes" cancelText="No">
-                        <a href="#"><Icon type="delete" /></a>
-                      </Popconfirm>]}
+                        <Icon key="edit" type="edit" onClick={() => this.selectMovie(movie)} />,
+                        <Popconfirm key="delete" title="Are you sure delete this movie?" onConfirm={e => this.deleteMovie(movie.id)} okText="Yes" cancelText="No">
+                          <a href="#"><Icon type="delete" /></a>
+                        </Popconfirm>]}
                     >
                       <Meta
                         title={movie.title}

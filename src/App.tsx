@@ -4,9 +4,12 @@ import { Layout, Menu } from 'antd'
 import './App.css'
 import MovieList from './components/MovieList'
 import AddMovie from './components/AddMovie'
+import UpdateMovie from './components/UpdateMovie'
+import { Query } from 'react-apollo';
+import { GET_SELECTED_MOVIE } from './queries/Queries';
 
 interface IAppProps {
-  client: Object
+  client: any
 }
 
 class App extends React.Component<IAppProps, {}> {
@@ -26,6 +29,15 @@ class App extends React.Component<IAppProps, {}> {
         <Content style={{ padding: '50px' }}>
           <AddMovie client={this.props.client} />
           <MovieList client={this.props.client} />
+          <Query query={GET_SELECTED_MOVIE}>
+            {({ loading, error, data }) => {
+              if (loading) return "Loading...";
+              if (error) return `Error! ${error.message}`
+              return (
+                data.selectedMovie.title ? <UpdateMovie movie={data.selectedMovie} client={this.props.client} /> : null
+              )
+            }}
+          </Query>
         </Content>
       </Layout>
     )

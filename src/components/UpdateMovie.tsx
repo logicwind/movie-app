@@ -1,19 +1,33 @@
 import * as React from 'react'
 import { Form, Modal, Button, Input, InputNumber, DatePicker } from 'antd'
-import { CREATE_MOVIE } from '../queries/Mutations'
+import { UPDATE_MOVIE } from '../queries/Mutations'
 import { GET_MOVIES } from '../queries/Queries'
+import moment from 'moment'
+
 const { TextArea } = Input
 
 const FormItem = Form.Item
 
 interface IAddMovieProps {
   client: any,
-  form: any
+  form: any,
+  movie: any
 }
 
-class AddMovie extends React.Component<IAddMovieProps, {}> {
+type AddMovieState = {
+  selectedMovie: string,
+  visible: boolean
+}
 
-  state = { visible: false }
+class UpdateMovie extends React.Component<IAddMovieProps, AddMovieState> {
+
+  constructor(props) {
+    super(props)
+    this.state = {
+      visible: true,
+      selectedMovie: props.movie
+    }
+  }
 
   showModal = () => {
     this.setState({
@@ -30,31 +44,28 @@ class AddMovie extends React.Component<IAddMovieProps, {}> {
   handleCancel = (e) => {
     this.setState({
       visible: false,
-    });
+    })
   }
 
-  handleSubmit = (e) => {
-    e.preventDefault();
+  setSelectedMovie = (selectedMovie) => {
+    this.setState({
+      selectedMovie: selectedMovie
+    })
+  }
+
+  handleSubmit = (id, e) => {
+    e.preventDefault()
     const { client, form } = this.props
     form.validateFields((err, values) => {
       if (!err) {
         const { poster, title, description, rating, date } = values
+        this.handleOk(e)
         client.mutate({
-          mutation: CREATE_MOVIE, variables: {
-            poster, title, description, rating, releaseDate: date
+          mutation: UPDATE_MOVIE, variables: {
+            id, poster, title, description, rating, releaseDate: date
           },
           refetchQueries: {
             query: GET_MOVIES
-          },
-          update: (store, { data: { createMovie } }) => {
-            const { movies } = store.readQuery({ query: GET_MOVIES })
-            const newMovie = createMovie
-            store.writeQuery({
-              query: GET_MOVIES,
-              data: { movies: [...movies, newMovie] }
-            })
-            form.resetFields()
-            this.handleOk(e)
           }
         })
       }
@@ -63,23 +74,23 @@ class AddMovie extends React.Component<IAddMovieProps, {}> {
 
   render() {
     const { getFieldDecorator } = this.props.form
+    const { movie } = this.props
+    console.log(movie)
     return (
       <div>
-        <Button type="primary" onClick={this.showModal}>
-          Add Movie
-        </Button>
         <Modal
-          title="Add Movie"
+          title="Update Movie"
           visible={this.state.visible}
           onOk={this.handleOk}
           onCancel={this.handleCancel}
           footer={null}
         >
-          <Form onSubmit={this.handleSubmit} className="login-form">
+          <Form onSubmit={(e) => this.handleSubmit(movie.id, e)} className="login-form">
             <FormItem>
               Poster
               {getFieldDecorator('poster', {
                 rules: [{ required: true, message: 'Please enter poster url' }],
+                initialValue: movie.poster
               })(
                 <Input placeholder="movie poster url" />
               )}
@@ -88,6 +99,7 @@ class AddMovie extends React.Component<IAddMovieProps, {}> {
               Title
               {getFieldDecorator('title', {
                 rules: [{ required: true, message: 'Please enter title' }],
+                initialValue: movie.title
               })(
                 <Input placeholder="title" />
               )}
@@ -96,6 +108,7 @@ class AddMovie extends React.Component<IAddMovieProps, {}> {
               Description
               {getFieldDecorator('description', {
                 rules: [{ required: true, message: 'Please enter description' }],
+                initialValue: movie.description
               })(
                 <TextArea placeholder="description" rows={4} />
               )}
@@ -105,6 +118,7 @@ class AddMovie extends React.Component<IAddMovieProps, {}> {
               <br />
               {getFieldDecorator('rating', {
                 rules: [{ required: true, message: 'Please enter ratings' }],
+                initialValue: movie.rating
               })(
                 <InputNumber min={1} max={10} />
               )}
@@ -114,21 +128,22 @@ class AddMovie extends React.Component<IAddMovieProps, {}> {
               <br />
               {getFieldDecorator('date', {
                 rules: [{ required: true, message: 'Please select date' }],
+                initialValue: moment(movie.releaseDate, 'YYYY-MM-DD')
               })(
                 <DatePicker />
               )}
             </FormItem>
             <br />
             <Button type="primary" htmlType="submit" className="login-form-button">
-              Add
+              Update
           </Button>&nbsp;&nbsp;&nbsp;<Button key="back" onClick={this.handleCancel}>Cancel</Button>
           </Form>
         </Modal>
       </div>
-    );
+    )
   }
 }
 
-const WrappedAddMovie = Form.create()(AddMovie)
+const WrappedUpdateMovie = Form.create()(UpdateMovie)
 
-export default WrappedAddMovie
+export default WrappedUpdateMovie
