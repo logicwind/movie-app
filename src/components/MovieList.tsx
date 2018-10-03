@@ -7,7 +7,8 @@ import { GET_MOVIES, GET_SELECTED_MOVIE } from '../queries/Queries'
 import { SELECT_MOVIE, DELETE_MOVIE } from '../queries/Mutations'
 
 interface MovieListProps {
-  client: any
+  client: any,
+  showModal: any
 }
 
 class MovieList extends React.Component<MovieListProps, {}> {
@@ -43,6 +44,7 @@ class MovieList extends React.Component<MovieListProps, {}> {
         query: GET_SELECTED_MOVIE
       },
     })
+    this.props.showModal()
   }
 
   public render() {

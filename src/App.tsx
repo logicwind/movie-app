@@ -12,7 +12,31 @@ interface IAppProps {
   client: any
 }
 
-class App extends React.Component<IAppProps, {}> {
+type IAppState = {
+  visible: boolean
+}
+
+class App extends React.Component<IAppProps, IAppState> {
+
+  constructor(props) {
+    super(props)
+    this.state = {
+      visible: false
+    }
+  }
+
+  showModal = () => {
+    this.setState({
+      visible: true
+    })
+  }
+
+  closeModal = () => {
+    this.setState({
+      visible: false
+    })
+  }
+
   public render() {
     return (
       <Layout className="layout">
@@ -28,13 +52,13 @@ class App extends React.Component<IAppProps, {}> {
         </Header>
         <Content style={{ padding: '50px' }}>
           <AddMovie client={this.props.client} />
-          <MovieList client={this.props.client} />
+          <MovieList client={this.props.client} showModal={this.showModal} />
           <Query query={GET_SELECTED_MOVIE}>
             {({ loading, error, data }) => {
               if (loading) return "Loading...";
               if (error) return `Error! ${error.message}`
               return (
-                data.selectedMovie.title ? <UpdateMovie movie={data.selectedMovie} client={this.props.client} /> : null
+                data.selectedMovie.title ? <UpdateMovie visible={this.state.visible} closeModal={this.closeModal} movie={data.selectedMovie} client={this.props.client} /> : null
               )
             }}
           </Query>

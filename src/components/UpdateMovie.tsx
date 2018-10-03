@@ -11,46 +11,19 @@ const FormItem = Form.Item
 interface IAddMovieProps {
   client: any,
   form: any,
-  movie: any
+  movie: any,
+  visible: boolean,
+  closeModal
 }
 
-type AddMovieState = {
-  selectedMovie: string,
-  visible: boolean
-}
-
-class UpdateMovie extends React.Component<IAddMovieProps, AddMovieState> {
-
-  constructor(props) {
-    super(props)
-    this.state = {
-      visible: true,
-      selectedMovie: props.movie
-    }
-  }
-
-  showModal = () => {
-    this.setState({
-      visible: true,
-    });
-  }
+class UpdateMovie extends React.Component<IAddMovieProps, {}> {
 
   handleOk = (e) => {
-    this.setState({
-      visible: false,
-    });
+    this.props.closeModal()
   }
 
   handleCancel = (e) => {
-    this.setState({
-      visible: false,
-    })
-  }
-
-  setSelectedMovie = (selectedMovie) => {
-    this.setState({
-      selectedMovie: selectedMovie
-    })
+    this.props.closeModal()
   }
 
   handleSubmit = (id, e) => {
@@ -75,12 +48,11 @@ class UpdateMovie extends React.Component<IAddMovieProps, AddMovieState> {
   render() {
     const { getFieldDecorator } = this.props.form
     const { movie } = this.props
-    console.log(movie)
     return (
       <div>
         <Modal
           title="Update Movie"
-          visible={this.state.visible}
+          visible={this.props.visible}
           onOk={this.handleOk}
           onCancel={this.handleCancel}
           footer={null}
