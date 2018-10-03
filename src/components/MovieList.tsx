@@ -1,10 +1,9 @@
 import * as React from 'react'
-const { Meta } = Card
-import { Card } from 'antd'
-import { Col, Icon, Popconfirm, Row } from 'antd'
+import { Row } from 'antd'
 import { Query } from "react-apollo"
 import { GET_MOVIES, GET_SELECTED_MOVIE } from '../queries/Queries'
 import { SELECT_MOVIE, DELETE_MOVIE } from '../queries/Mutations'
+import MovieCard from './MovieCard'
 
 interface MovieListProps {
   client: any,
@@ -57,28 +56,7 @@ class MovieList extends React.Component<MovieListProps, {}> {
           return (
             <Row gutter={40} style={{ paddingTop: 40, }}>
               {data.movies ? data.movies.map(movie => (
-
-                <Col xs={{ span: 12 }} lg={{ span: 6 }} style={{ height: 800 }} key={movie.id}>
-                  <div>
-                    <Card
-                      key={movie.id}
-                      style={{ width: 300 }}
-                      cover={<img alt={movie.title} src={movie.poster} />}
-                      actions={[
-                        <Icon key="edit" type="edit" onClick={() => this.selectMovie(movie)} />,
-                        <Popconfirm key="delete" title="Are you sure delete this movie?" onConfirm={e => this.deleteMovie(movie.id)} okText="Yes" cancelText="No">
-                          <a href="#"><Icon type="delete" /></a>
-                        </Popconfirm>]}
-                    >
-                      <Meta
-                        title={movie.title}
-                        description={<div>{movie.description}
-                          <br /><b>rating</b>: {movie.rating}/10
-                          <br /><b>release date</b>: {new Date(movie.releaseDate).toString()}</div>}
-                      />
-                    </Card>
-                  </div>
-                </Col>
+                <MovieCard key={movie.id} movie={movie} selectMovie={this.selectMovie} deleteMovie={this.deleteMovie} />
               )) : null}
             </Row>
           )
